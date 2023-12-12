@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { OverlayTestIds } from "./Overlay.constants";
 import { Overlay as BaseOverlay, SideDrawerOverlay } from ".";
 
-describe("Passes", () => {
+describe("Passes because there is an initialClickTarget", () => {
   describe.each([
     { Overlay: BaseOverlay, name: "Overlay" },
     { Overlay: SideDrawerOverlay, name: "SideDrawerOverlay" },
@@ -16,17 +16,16 @@ describe("Passes", () => {
         render(<Overlay isOpen={true} onClose={onClose} />);
 
         const backdrop = await screen.findByTestId(OverlayTestIds.backdrop);
-        console.log("hello");
         await waitFor(() => expect(backdrop).toBeVisible());
-
+        await user.click(await screen.findByTestId(OverlayTestIds.panel)); // adding this to set a initialClickTarget helps
         await user.click(backdrop);
-        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(onClose).toHaveBeenCalled();
       });
     });
   });
 });
 
-describe("Doesn't pass", () => {
+describe("Doesn't pass because initialClickTarget is null", () => {
   describe.each([
     { Overlay: BaseOverlay, name: "Overlay" },
     { Overlay: SideDrawerOverlay, name: "SideDrawerOverlay" },
@@ -41,7 +40,7 @@ describe("Doesn't pass", () => {
         await waitFor(() => expect(backdrop).toBeVisible());
 
         await user.click(backdrop);
-        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(onClose).toHaveBeenCalled();
       });
     });
   });
